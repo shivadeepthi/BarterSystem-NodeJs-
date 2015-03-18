@@ -1,0 +1,91 @@
+<html>
+<head>
+<title>Free Door</title>
+<script src="/jquery-1.11.0.min.js"></script>
+<script>
+$( document ).ready(function() {
+	$("#header").load("header.ejs");
+	
+	$('[name="addcart"]').click(function(e){
+		e.preventDefault();
+		console.log('add to cart clicked');
+		                    
+		var data = {};
+		data.id = this.id;
+							
+		$.ajax({
+			type: 'POST',
+			data: JSON.stringify(data),
+		    contentType: 'application/json',
+		    url: 'http://localhost:4242/addtocart',						
+		    success: function(data) {
+			    console.log('success');
+		        console.log(JSON.stringify(data));
+		        alert("Product has been added to your shopping cart. Click on Shopping Cart icon to view your cart.")
+		    }
+		});
+	 
+	});				
+});
+</script>
+</head>
+<body>
+<div id="header"></div><br />
+<% if(session.name.length != 0){ %>
+<h3>Welcome <%= session.name %>! </h3>
+&nbsp;&nbsp;<a href="http://localhost:4242/logout"><h3>Logout</h3></a>
+You were last logged in on: <%= session.last_time %>
+<% } else { %>
+<a href="http://localhost:4242/login"><h3>Login</h3></a>
+<% } %>
+
+<h1 align="center">Welcome to Free Door</h1>
+
+<div id="main">
+<table width="90%">
+<tr>
+<td width="10%" valign="top">
+
+
+<div id="menu" valign="top" align="left">
+	<table border="0" align="left" valign="top">
+		<%console.log("he" + categories_freeDoor[0])%>
+	<% if (categories_freeDoor_count) { %>
+		
+			<% for(var count=0 ; count < categories_freeDoor_count ; count ++){ %>
+		
+					<tr><a href="/category?categoryId=<%=categories_freeDoor[count].categoryId %>" id="<%=categories_freeDoor[count].categoryName%>" value="<%=categories_freeDoor[count].categoryName%>" class="catalogList"><h3><%=categories_freeDoor[count].categoryName%></h3></a></tr>
+					
+					<% } %>
+			
+	<% } %>
+	</table>
+</div>
+</td>
+<td>
+<div id="content">
+<% if(session.name == "Admin"){ %>
+<a href="http://localhost:4242/addproduct">Add a new product</a>
+<% } %>
+<% if(products.length != 0){ %>
+
+<ul align="center" width=100%>
+<% products.forEach(function(product){ %>
+
+<li style="float:left;padding:10px 30px 0 0">
+ <h3><%= product.productName %></h3>
+ Description: <p> <%= product.productDesc %></p>
+ <%= product.quantity %> items available.<br>
+<a href="/product?productId=<%=product.productId %>">View</a><br>
+<input type="button" name="addcart" id="<%= product.productId %>" value="Trade"> </input>
+</li>
+<% }) %>
+</ul>
+<% } %>
+</div>
+</td>
+</tr>
+</table>
+</div><br />
+</body>
+</html>
